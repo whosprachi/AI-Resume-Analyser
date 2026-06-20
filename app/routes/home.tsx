@@ -1,30 +1,55 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
+
 import Navbar from "~/components/Navbar";
-import { resumes } from "~/routes/constants";
 import ResumeCard from "~/components/ResumeCard";
+import { resumes } from "~/routes/constants";
+import { usePuterStore } from "~/lib/puter";
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Resumind" },
-    { name: "description", content: "Smart feedback for your dream job"},
+    {
+      name: "description",
+      content: "Smart feedback for your dream job",
+    },
   ];
 }
 
 export default function Home() {
-  return <main className="bg-[url('/images/bg-main.svg')] bg-cover">
-    <Navbar />
-    <section className="main-section">
-       <div className="page-heading">
-        <h1>Track Your Application And Resume Ratings</h1>
-        <h2>Review your submissions and check AI-powered feedback.</h2>
-       </div>
-    </section>
+  const { auth } = usePuterStore();
+  const navigate = useNavigate();
 
- {resumes.length > 0 &&
-  resumes.map((resume) => (
-    <ResumeCard key={resume.id} resume={resume} />
-  ))
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/auth?next=/");
+    }
+  }, [auth.isAuthenticated, navigate]);
 
-}
-  </main>
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.puter?.ai?.chat) {
+      console.log("Puter AI is available");
+      // window.puter.ai.chat();
+    }
+  }, []);
+
+  return (
+    <main className="bg-[url('/images/bg-main.svg')] bg-cover">
+      <Navbar />
+
+      <section className="main-section">
+        <div className="page-heading py-16">
+          <h1>Track Your Application And Resume Ratings</h1>
+          <h2>Review your submissions and check AI-powered feedback.</h2>
+        </div>
+
+        {resumes.length > 0 &&
+          resumes.map((resume) => (
+            <ResumeCard key={resume.id} resume={resume} />
+          ))}
+      </section>
+    </main>
+  );
 }
