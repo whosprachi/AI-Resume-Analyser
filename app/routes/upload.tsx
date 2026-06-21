@@ -67,7 +67,7 @@ const handleAnalyze = async ({
         uploadedFile.path,
         prepareInstructions({jobTitle,jobDescription,})
     )
-    if (feedback) return statusText('Error: Failed to analyse resume');
+    if (feedback) return setStatusText('Error: Failed to analyse resume');
      
     const feedbackText = typeof feedback.message.content === 'string' 
     ?  feedback.message.content
@@ -75,8 +75,9 @@ const handleAnalyze = async ({
 
     data.feedback =JSON.parse(feedbackText);
     await kv.set(`resume:${uuid}`,JSON.stringify(data));
-    setStatusText('Analysis complete,redirecting...');
+    setStatusText('Analysis complete, redirecting...');
     console.log(data);
+    navigate(`/resume/${uuid}`);
 
 
 };
